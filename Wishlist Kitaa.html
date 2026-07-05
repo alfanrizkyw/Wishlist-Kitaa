@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Our Adventure Wishlist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0D0A0B;
+            --bg2: #161214;
+            --card: rgba(22, 18, 20, 0.85);
+            --accent: #C9956B;
+            --rose: #D4727A;
+            --text: #F0E6DA;
+            --muted: #7A6E66;
+            --dim: #4A4240;
+            --border: #2A2325;
+            --success: #8BAA7A;
+            --error: #C75050;
+            --glass: rgba(22, 18, 20, 0.92);
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 80%, rgba(201,149,107,0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(212,114,122,0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(13,10,11,0.7) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        #particles-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ===== PASSWORD SCREEN ===== */
+        #password-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+        }
+
+        #password-screen.exit {
+            opacity: 0;
+            transform: scale(1.06);
+            pointer-events: none;
+        }
+
+        .lock-icon {
+            font-size: 48px;
+            color: var(--accent);
+            margin-bottom: 32px;
+            animation: heartFloat 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(201,149,107,0.3));
+        }
+
+        @keyframes heartFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .lock-icon.pulse {
+            animation: heartPulse 0.6s ease-out;
+        }
+
+        @keyframes heartPulse {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.35); }
+            60% { transform: scale(0.92); }
+            100% { transform: scale(1); }
+        }
+
+        .pw-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(28px, 6vw, 42px);
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            text-align: center;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .pw-subtitle {
+            font-size: 14px;
+            color: var(--muted);
+            margin-bottom: 36px;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        .pw-input-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 20px;
+        }
+
+        .pw-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: var(--text);
+            font-size: 18px;
+            font-family: 'Lato', sans-serif;
+            letter-spacing: 0.15em;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .pw-input::placeholder {
+            color: var(--dim);
+            letter-spacing: 0.05em;
+            font-size: 14px;
+        }
+
+        .pw-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(201,149,107,0.1);
+        }
+
+        .pw-error {
+            font-size: 13px;
+            color: var(--error);
+            margin-bottom: 16px;
+            min-height: 20px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .pw-error.show { opacity: 1; }
+
+        .pw-btn {
+            width: 100%;
+            max-width: 320px;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent), var(--rose));
+            border: none;
+            border-radius: 14px;
+            color: var(--bg);
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'Lato', sans-serif;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .pw-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(201,149,107,0.3); }
+        .pw-btn:active { transform: scale(0.97); }
+
+        /* ===== MAIN APP ===== */
+        #main-app {
+            position: relative;
+            z-index: 2;
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 24px 20px 120px;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s, transform 0.8s cubic-bezier(0.16,1,0.3,1) 0.3s;
+            display: none;
+        }
+
+        #main-app.visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .app-header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding-top: 20px;
+        }
+
+        .app-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(30px, 7vw, 46px);
+            font-weight: 300;
+            letter-spacing: 0.01em;
+            margin-bottom: 6px;
+            background: linear-gradient(135deg, var(--text), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .app-subtitle {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .sync-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--dim);
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+        .sync-dot.connected { background: var(--success); }
+        .sync-dot.syncing { background: #D4A030; animation: dotPulse 1s infinite; }
+        .sync-dot.local { background: var(--error); }
+        .sync-dot.loading { background: var(--muted); animation: dotPulse 1s infinite; }
+
+        @keyframes dotPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Stats */
+        .stats-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .stats-count { font-weight: 300; }
+        .stats-count strong { color: var(--accent); font-weight: 700; }
+
+        .progress-track {
+            width: 100%;
+            height: 3px;
+            background: var(--border);
+            border-radius: 999px;
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--rose), var(--accent));
+            transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+            position: relative;
+            width: 0%;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            animation: shimmer 2.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Cards */
+        .wishlist-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            backdrop-filter: blur(12px);
+            transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.4s;
+            animation: cardIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
+        }
+
+        .wishlist-card.removing {
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: all 0.4s cubic-bezier(0.7,0,0.84,0);
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (hover: hover) {
+            .wishlist-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 28px rgba(0,0,0,0.3);
+                border-color: rgba(201,149,107,0.12);
+            }
+        }
+
+        .wishlist-card.completed {
+            border-color: rgba(139,170,122,0.15);
+        }
+
+        .check-circle {
+            width: 26px;
+            height: 26px;
+            min-width: 26px;
+            border-radius: 50%;
+            border: 2px solid var(--dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+            margin-top: 2px;
+        }
+
+        .check-circle:hover { border-color: var(--muted); }
+
+        .check-circle.checked {
+            border-color: var(--success);
+            background: var(--success);
+        }
+
+        .check-circle .fa-check {
+            font-size: 11px;
+            color: var(--bg);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+        }
+
+        .check-circle.checked .fa-check {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .card-body { flex: 1; min-width: 0; }
+
+        .card-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            transition: color 0.3s;
+            word-break: break-word;
+        }
+
+        .card-name.done {
+            color: var(--muted);
+            text-decoration: none;
+            position: relative;
+        }
+
+        .card-name.done::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: 1px;
+            background: var(--accent);
+            opacity: 0.5;
+        }
+
+        .card-date {
+            font-size: 11px;
+            color: var(--dim);
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .card-photos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .photo-thumb {
+            width: 64px;
+            height: 64px;
+            border-radius: 10px;
+            object-fit: cover;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .photo-thumb:hover {
+            transform: scale(1.05);
+            border-color: var(--accent);
+        }
+
+        .add-photo-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 10px;
+            border: 1px dashed var(--dim);
+            background: transparent;
+            color: var(--dim);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .add-photo-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(201,149,107,0.05);
+        }
+
+        .card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            opacity: 0.4;
+            transition: opacity 0.3s;
+        }
+
+        .wishlist-card:hover .card-actions { opacity: 1; }
+
+        .card-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255,255,255,0.04);
+            color: var(--muted);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .card-action-btn:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+        .card-action-btn.delete:hover { color: var(--error); }
+
+        .hidden-input { display: none; }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+            animation: cardIn 0.6s cubic-bezier(0.16,1,0.3,1) both;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            color: var(--dim);
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 8px;
+            color: var(--muted);
+        }
+
+        .empty-desc {
+            font-size: 14px;
+            color: var(--dim);
+            margin-bottom: 28px;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .empty-btn {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--accent), var(--rose));
+            border: none;
+            border-radius: 12px;
+            color: var(--bg);
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Lato', sans-serif;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.3s;
+        }
+
+        .empty-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,149,107,0.3); }
+        .empty-btn:active { transform: scale(0.97); }
+
+        /* FAB */
+        #fab {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--rose));
+            border: none;
+            color: var(--bg);
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 4px 24px rgba(201,149,107,0.35);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s;
+            animation: fabGlow 3s ease-in-out infinite;
+        }
+
+        #fab.visible { display: flex; }
+        #fab:hover { transform: scale(1.1) rotate(90deg); box-shadow: 0 6px 32px rgba(201,149,107,0.45); }
+        #fab:active { transform: scale(0.92) rotate(90deg); }
+
+        @keyframes fabGlow {
+            0%, 100% { box-shadow: 0 4px 24px rgba(201,149,107,0.3); }
+            50% { box-shadow: 0 4px 36px rgba(201,149,107,0.5); }
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 24px 24px 0 0;
+            padding: 32px 24px;
+            padding-bottom: max(32px, env(safe-area-inset-bottom));
+            width: 100%;
+            max-width: 640px;
+            transform: translateY(100%);
+            transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-handle {
+            width: 36px;
+            height: 4px;
+            background: var(--dim);
+            border-radius: 999px;
+            margin: 0 auto 24px;
+        }
+
+        .modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 6px;
+        }
+
+        .modal-desc {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 24px;
+            font-weight: 300;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 16px 18px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: var(--text);
+            font-size: 16px;
+            font-family: 'Lato', sans-serif;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            margin-bottom: 24px;
+        }
+
+        .modal-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(201,149,107,0.1);
+        }
+
+        .modal-input::placeholder { color: var(--dim); }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Lato', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .modal-btn.cancel {
+            background: rgba(255,255,255,0.06);
+            color: var(--muted);
+        }
+
+        .modal-btn.cancel:hover { background: rgba(255,255,255,0.1); color: var(--text); }
+
+        .modal-btn.save {
+            background: linear-gradient(135deg, var(--accent), var(--rose));
+            color: var(--bg);
+        }
+
+        .modal-btn.save:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(201,149,107,0.3); }
+        .modal-btn.save:active { transform: scale(0.97); }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 600;
+            background: rgba(0,0,0,0.92);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+            padding: 24px;
+        }
+
+        .lightbox.active { opacity: 1; pointer-events: auto; }
+
+        .lightbox img {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 12px;
+            transform: scale(0.9);
+            transition: transform 0.45s cubic-bezier(0.16,1,0.3,1);
+        }
+
+        .lightbox.active img { transform: scale(1); }
+
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--text);
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .lightbox-close:hover { background: rgba(255,255,255,0.2); }
+
+        /* Toast */
+        #toast-container {
+            position: fixed;
+            bottom: 96px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 18px;
+            border-radius: 14px;
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 13px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+            animation: toastIn 0.4s cubic-bezier(0.16,1,0.3,1);
+            pointer-events: auto;
+            white-space: nowrap;
+        }
+
+        .toast-undo {
+            color: var(--accent);
+            font-weight: 700;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-family: 'Lato', sans-serif;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .toast-undo:hover { background: rgba(201,149,107,0.1); }
+
+        .toast.exit { animation: toastOut 0.3s ease-in forwards; }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(-8px) scale(0.95); }
+        }
+
+        /* Burst Particles */
+        .burst {
+            position: fixed;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            animation: burstAnim 0.6s ease-out forwards;
+        }
+
+        @keyframes burstAnim {
+            0% { transform: translate(0,0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* Photo note */
+        .photo-note {
+            font-size: 10px;
+            color: var(--dim);
+            text-align: center;
+            margin-top: 24px;
+            font-weight: 300;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            #main-app { padding: 16px 14px 110px; }
+            .wishlist-card { padding: 14px 12px; gap: 10px; }
+            .card-name { font-size: 17px; }
+            .photo-thumb { width: 52px; height: 52px; }
+            .add-photo-btn { width: 52px; height: 52px; font-size: 15px; }
+            .card-actions { opacity: 0.6; }
+            #fab { bottom: 20px; right: 20px; width: 50px; height: 50px; font-size: 20px; }
+        }
+
+        @media (min-width: 768px) {
+            .modal-content { border-radius: 24px; margin-bottom: 10vh; }
+            .modal-overlay { align-items: center; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 999px; }
+    </style>
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Password Screen -->
+    <div id="password-screen">
+        <div class="lock-icon"><i class="fas fa-heart"></i></div>
+        <h1 class="pw-title">Our Adventure Wishlist</h1>
+        <p class="pw-subtitle">Masukkan tanggal spesial kalian</p>
+        <div class="pw-input-wrap">
+            <input type="text" class="pw-input" id="pw-input" placeholder="dd mm yyyy" inputmode="numeric" autocomplete="off" autofocus>
+        </div>
+        <p class="pw-error" id="pw-error">Tanggal tidak cocok, coba lagi</p>
+        <button class="pw-btn" id="pw-btn">Buka</button>
+    </div>
+
+    <!-- Main App -->
+    <div id="main-app">
+        <header class="app-header">
+            <h1 class="app-title">Adventure Wishlist</h1>
+            <p class="app-subtitle">
+                <span class="sync-dot" id="sync-dot"></span>
+                <span id="sync-text">Menyinkronkan...</span>
+            </p>
+        </header>
+
+        <div class="stats-bar">
+            <span class="stats-count" id="stats-text">0 dari 0 petualangan</span>
+            <span id="stats-percent" style="color:var(--accent);font-weight:700;">0%</span>
+        </div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <div id="wishlist-container"></div>
+        <p class="photo-note" id="photo-note" style="display:none;">
+            <i class="fas fa-info-circle"></i> Foto tersimpan lokal di perangkat ini
+        </p>
+    </div>
+
+    <!-- FAB -->
+    <button id="fab" aria-label="Tambah tempat baru"><i class="fas fa-plus"></i></button>
+
+    <!-- Add Modal -->
+    <div class="modal-overlay" id="add-modal">
+        <div class="modal-content">
+            <div class="modal-handle"></div>
+            <h3 class="modal-title">Tambah Petualangan Baru</h3>
+            <p class="modal-desc">Tempat mana yang ingin kalian kunjungi bersama?</p>
+            <input type="text" class="modal-input" id="new-place-input" placeholder="Contoh: Santorini, Yunani" autocomplete="off">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="modal-cancel">Batal</button>
+                <button class="modal-btn save" id="modal-save">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" id="lightbox-close"><i class="fas fa-xmark"></i></button>
+        <img id="lightbox-img" src="" alt="Foto petualangan">
+    </div>
+
+    <!-- Toast -->
+    <div id="toast-container"></div>
+
+    <script>
+    /* ===== PARTICLE SYSTEM ===== */
+    class ParticleSystem {
+        constructor(canvas) {
+            this.canvas = canvas;
+            this.ctx = canvas.getContext('2d');
+            this.particles = [];
+            this.mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+            this.running = true;
+            this.resize();
+            this.init();
+            this.animate();
+            window.addEventListener('resize', () => this.resize());
+            window.addEventListener('mousemove', e => { this.mouse.x = e.clientX; this.mouse.y = e.clientY; });
+            window.addEventListener('touchmove', e => {
+                if (e.touches[0]) { this.mouse.x = e.touches[0].clientX; this.mouse.y = e.touches[0].clientY; }
+            }, { passive: true });
+        }
+
+        resize() {
+            this.canvas.width = window.innerWidth;
+            this.canvas.height = window.innerHeight;
+        }
+
+        init() {
+            const colors = ['#C9956B', '#D4A574', '#D4727A', '#E8C4A0', '#B8866B', '#A68B6B'];
+            const count = Math.min(45, Math.floor(window.innerWidth / 25));
+            for (let i = 0; i < count; i++) {
+                this.particles.push({
+                    x: Math.random() * this.canvas.width,
+                    y: Math.random() * this.canvas.height,
+                    size: Math.random() * 2.2 + 0.6,
+                    opacity: Math.random() * 0.35 + 0.08,
+                    vy: -(Math.random() * 0.4 + 0.08),
+                    vx: (Math.random() - 0.5) * 0.2,
+                    wobble: Math.random() * Math.PI * 2,
+                    ws: Math.random() * 0.015 + 0.004,
+                    color: colors[Math.floor(Math.random() * colors.length)]
+                });
+            }
+        }
+
+        animate() {
+            if (!this.running) return;
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            const cx = this.canvas.width / 2, cy = this.canvas.height / 2;
+            for (const p of this.particles) {
+                p.wobble += p.ws;
+                p.x += p.vx + Math.sin(p.wobble) * 0.25;
+                p.y += p.vy;
+                const dx = (this.mouse.x - cx) * 0.00008 * p.size;
+                const dy = (this.mouse.y - cy) * 0.00008 * p.size;
+                p.x += dx; p.y += dy;
+                if (p.y < -10) { p.y = this.canvas.height + 10; p.x = Math.random() * this.canvas.width; }
+                if (p.x < -10) p.x = this.canvas.width + 10;
+                if (p.x > this.canvas.width + 10) p.x = -10;
+                this.ctx.save();
+                this.ctx.globalAlpha = p.opacity;
+                this.ctx.beginPath();
+                this.ctx.arc(p.x, p.y, Math.max(0.1, p.size), 0, Math.PI * 2);
+                this.ctx.fillStyle = p.color;
+                this.ctx.shadowBlur = p.size * 5;
+                this.ctx.shadowColor = p.color;
+                this.ctx.fill();
+                this.ctx.restore();
+            }
+            requestAnimationFrame(() => this.animate());
+        }
+    }
+
+    /* ===== APP ===== */
+    const App = {
+        state: { items: [], lastModified: 0 },
+        photos: {},      // { itemId: [base64, ...] }
+        bucketId: null,
+        cloudTimeout: null,
+
+        async init() {
+            new ParticleSystem(document.getElementById('particles-canvas'));
+
+            // Cek sesi sebelumnya
+            if (sessionStorage.getItem('wl_auth')) {
+                this.bucketId = sessionStorage.getItem('wl_bid');
+                this.showApp();
+                this.loadLocalData();
+                this.loadLocalPhotos();
+                this.render();
+                this.cloudSync();
+                return;
+            }
+
+            // Event password
+            const pwInput = document.getElementById('pw-input');
+            const pwBtn = document.getElementById('pw-btn');
+            const pwError = document.getElementById('pw-error');
+
+            const tryPassword = async () => {
+                const val = pwInput.value.replace(/\s/g, '').trim();
+                if (val === '22082026') {
+                    pwError.classList.remove('show');
+                    const icon = document.querySelector('.lock-icon');
+                    icon.classList.add('pulse');
+                    this.bucketId = await this.deriveBucketId('22082026');
+                    sessionStorage.setItem('wl_auth', '1');
+                    sessionStorage.setItem('wl_bid', this.bucketId);
+                    setTimeout(() => this.transitionToApp(), 500);
+                } else {
+                    pwError.classList.add('show');
+                    pwInput.style.borderColor = 'var(--error)';
+                    setTimeout(() => { pwInput.style.borderColor = ''; }, 1500);
+                }
+            };
+
+            pwBtn.addEventListener('click', tryPassword);
+            pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryPassword(); });
+        },
+
+        async deriveBucketId(pw) {
+            const enc = new TextEncoder();
+            const buf = await crypto.subtle.digest('SHA-256', enc.encode('adv-wl-' + pw));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        },
+
+        transitionToApp() {
+            const pwScreen = document.getElementById('password-screen');
+            pwScreen.classList.add('exit');
+            setTimeout(() => {
+                pwScreen.style.display = 'none';
+                this.showApp();
+                this.loadLocalData();
+                this.loadLocalPhotos();
+                this.render();
+                this.cloudSync();
+            }, 700);
+        },
+
+        showApp() {
+            const app = document.getElementById('main-app');
+            const fab = document.getElementById('fab');
+            app.style.display = 'block';
+            fab.classList.add('visible');
+            // Trigger reflow lalu tambah class untuk animasi
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    app.classList.add('visible');
+                });
+            });
+            this.bindAppEvents();
+        },
+
+        bindAppEvents() {
+            if (this._bound) return;
+            this._bound = true;
+
+            document.getElementById('fab').addEventListener('click', () => this.openAddModal());
+            document.getElementById('modal-cancel').addEventListener('click', () => this.closeAddModal());
+            document.getElementById('modal-save').addEventListener('click', () => this.saveNewItem());
+            document.getElementById('lightbox').addEventListener('click', e => {
+                if (e.target === e.currentTarget || e.target.closest('.lightbox-close')) this.closeLightbox();
+            });
+            document.getElementById('add-modal').addEventListener('click', e => {
+                if (e.target === e.currentTarget) this.closeAddModal();
+            });
+
+            document.getElementById('new-place-input').addEventListener('keydown', e => {
+                if (e.key === 'Enter') this.saveNewItem();
+            });
+        },
+
+        /* ===== DATA ===== */
+        loadLocalData() {
+            try {
+                const raw = localStorage.getItem('wl_data');
+                if (raw) this.state = JSON.parse(raw);
+            } catch(e) {}
+        },
+
+        saveLocalData() {
+            try { localStorage.setItem('wl_data', JSON.stringify(this.state)); } catch(e) {}
+        },
+
+        loadLocalPhotos() {
+            try {
+                const raw = localStorage.getItem('wl_photos');
+                if (raw) this.photos = JSON.parse(raw);
+            } catch(e) {}
+        },
+
+        saveLocalPhotos() {
+            try { localStorage.setItem('wl_photos', JSON.stringify(this.photos)); }
+            catch(e) { this.showToast('Penyimpanan penuh, hapus beberapa foto'); }
+        },
+
+        save() {
+            this.state.lastModified = Date.now();
+            this.saveLocalData();
+            this.saveLocalPhotos();
+            this.debouncedCloudSave();
+        },
+
+        /* ===== CLOUD SYNC (kvdb.io) ===== */
+        async cloudSync() {
+            this.setSyncStatus('loading');
+            try {
+                const controller = new AbortController();
+                this.cloudTimeout = setTimeout(() => controller.abort(), 6000);
+                const res = await fetch(`https://kvdb.io/${this.bucketId}/data`, { signal: controller.signal });
+                clearTimeout(this.cloudTimeout);
+                if (res.ok) {
+                    const cloud = await res.json();
+                    if (cloud && cloud.lastModified > this.state.lastModified) {
+                        this.state = cloud;
+                        this.saveLocalData();
+                        this.render();
+                    }
+                    this.setSyncStatus('connected');
+                } else {
+                    // Belum ada data cloud, upload yang lokal
+                    await this.pushToCloud();
+                    this.setSyncStatus('connected');
+                }
+            } catch(e) {
+                this.setSyncStatus('local');
+            }
+        },
+
+        async pushToCloud() {
+            if (!this.bucketId) return;
+            try {
+                const cloudData = {
+                    items: this.state.items.map(i => ({
+                        id: i.id, name: i.name, completed: i.completed,
+                        completedAt: i.completedAt, createdAt: i.createdAt
+                    })),
+                    lastModified: this.state.lastModified
+                };
+                await fetch(`https://kvdb.io/${this.bucketId}/data`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cloudData)
+                });
+            } catch(e) {}
+        },
+
+        debouncedCloudSave() {
+            clearTimeout(this._csTimer);
+            this.setSyncStatus('syncing');
+            this._csTimer = setTimeout(async () => {
+                await this.pushToCloud();
+                this.setSyncStatus('connected');
+            }, 1200);
+        },
+
+        setSyncStatus(status) {
+            const dot = document.getElementById('sync-dot');
+            const text = document.getElementById('sync-text');
+            dot.className = 'sync-dot ' + status;
+            const labels = {
+                connected: 'Tersinkronisasi',
+                syncing: 'Menyimpan...',
+                local: 'Hanya lokal',
+                loading: 'Menyinkronkan...'
+            };
+            text.textContent = labels[status] || '';
+        },
+
+        /* ===== RENDER ===== */
+        render() {
+            const container = document.getElementById('wishlist-container');
+            const items = this.state.items;
+            const photoNote = document.getElementById('photo-note');
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="fas fa-compass"></i></div>
+                        <h3 class="empty-title">Belum ada petualangan</h3>
+                        <p class="empty-desc">Tambahkan tempat impian kalian<br>untuk mulai menjelajah bersama</p>
+                        <button class="empty-btn" onclick="App.openAddModal()">Tambah Petualangan Pertama</button>
+                    </div>`;
+                photoNote.style.display = 'none';
+            } else {
+                container.innerHTML = items.map((item, i) => this.cardHTML(item, i)).join('');
+                const hasPhotos = Object.values(this.photos).some(a => a && a.length > 0);
+                photoNote.style.display = hasPhotos ? 'block' : 'none';
+            }
+            this.updateStats();
+        },
+
+        cardHTML(item, index) {
+            const photos = this.photos[item.id] || [];
+            const doneClass = item.completed ? 'completed' : '';
+            const checkedClass = item.completed ? 'checked' : '';
+            const nameClass = item.completed ? 'done' : '';
+            const dateStr = item.completed && item.completedAt
+                ? 'Selesai ' + new Date(item.completedAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+                : 'Ditambahkan ' + new Date(item.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            const photosHTML = photos.map((p, pi) =>
+                `<img class="photo-thumb" src="${p}" alt="Foto" onclick="App.openLightbox('${item.id}', ${pi})" loading="lazy">`
+            ).join('');
+
+            return `
+                <div class="wishlist-card ${doneClass}" data-id="${item.id}" style="animation-delay:${index * 0.04}s">
+                    <div class="check-circle ${checkedClass}" onclick="App.toggleItem('${item.id}')" role="checkbox" aria-checked="${item.completed}" tabindex="0">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-name ${nameClass}">${this.escHTML(item.name)}</div>
+                        <div class="card-date">${dateStr}</div>
+                        <div class="card-photos">
+                            ${photosHTML}
+                            <button class="add-photo-btn" onclick="App.triggerPhotoAdd('${item.id}')" aria-label="Tambah foto">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="card-action-btn delete" onclick="App.deleteItem('${item.id}')" aria-label="Hapus">
+                            <i class="fas fa-trash-can"></i>
+                        </button>
+                    </div>
+                    <input type="file" accept="image/*" class="hidden-input" data-item-id="${item.id}" onchange="App.handlePhotoSelect(event, '${item.id}')">
+                </div>`;
+        },
+
+        updateStats() {
+            const total = this.state.items.length;
+            const done = this.state.items.filter(i => i.completed).length;
+            const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+            document.getElementById('stats-text').innerHTML = `<strong>${done}</strong> dari ${total} petualangan`;
+            document.getElementById('stats-percent').textContent = pct + '%';
+            document.getElementById('progress-fill').style.width = pct + '%';
+        },
+
+        escHTML(str) {
+            const d = document.createElement('div');
+            d.textContent = str;
+            return d.innerHTML;
+        },
+
+        /* ===== ACTIONS ===== */
+        toggleItem(id) {
+            const item = this.state.items.find(i => i.id === id);
+            if (!item) return;
+            item.completed = !item.completed;
+            item.completedAt = item.completed ? Date.now() : null;
+
+            if (item.completed) {
+                // Burst effect
+                const card = document.querySelector(`.wishlist-card[data-id="${id}"]`);
+                const circle = card?.querySelector('.check-circle');
+                if (circle) {
+                    const rect = circle.getBoundingClientRect();
+                    this.burstParticles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                }
+                this.showToast('Petualangan selesai!');
+            }
+
+            this.save();
+            this.render();
+        },
+
+        deleteItem(id) {
+            const item = this.state.items.find(i => i.id === id);
+            if (!item) return;
+            const index = this.state.items.indexOf(item);
+            const name = item.name;
+
+            // Animasi keluar
+            const card = document.querySelector(`.wishlist-card[data-id="${id}"]`);
+            if (card) card.classList.add('removing');
+
+            setTimeout(() => {
+                this.state.items.splice(index, 1);
+                delete this.photos[id];
+                this.save();
+                this.render();
+            }, 400);
+
+            this.showToast(`"${name}" dihapus`, () => {
+                // Undo
+                this.state.items.splice(index, 0, item);
+                this.save();
+                this.render();
+            });
+        },
+
+        openAddModal() {
+            const modal = document.getElementById('add-modal');
+            const input = document.getElementById('new-place-input');
+            modal.classList.add('active');
+            input.value = '';
+            setTimeout(() => input.focus(), 350);
+        },
+
+        closeAddModal() {
+            document.getElementById('add-modal').classList.remove('active');
+        },
+
+        saveNewItem() {
+            const input = document.getElementById('new-place-input');
+            const name = input.value.trim();
+            if (!name) {
+                input.style.borderColor = 'var(--error)';
+                setTimeout(() => input.style.borderColor = '', 1200);
+                return;
+            }
+
+            this.state.items.unshift({
+                id: 'i_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+                name: name,
+                completed: false,
+                completedAt: null,
+                createdAt: Date.now()
+            });
+
+            this.save();
+            this.closeAddModal();
+            this.render();
+            this.showToast(`"${name}" ditambahkan`);
+        },
+
+        triggerPhotoAdd(itemId) {
+            const input = document.querySelector(`.hidden-input[data-item-id="${itemId}"]`);
+            if (input) input.click();
+        },
+
+        async handlePhotoSelect(event, itemId) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) return;
+
+            const base64 = await this.compressPhoto(file, 600, 0.55);
+            if (!this.photos[itemId]) this.photos[itemId] = [];
+            this.photos[itemId].push(base64);
+            this.saveLocalPhotos();
+            this.render();
+            event.target.value = '';
+            this.showToast('Foto ditambahkan');
+        },
+
+        compressPhoto(file, maxDim, quality) {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = e => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const c = document.createElement('canvas');
+                        let w = img.width, h = img.height;
+                        if (w > maxDim || h > maxDim) {
+                            if (w > h) { h = h * maxDim / w; w = maxDim; }
+                            else { w = w * maxDim / h; h = maxDim; }
+                        }
+                        c.width = Math.max(1, Math.round(w));
+                        c.height = Math.max(1, Math.round(h));
+                        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                        resolve(c.toDataURL('image/jpeg', quality));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        },
+
+        openLightbox(itemId, photoIndex) {
+            const photos = this.photos[itemId];
+            if (!photos || !photos[photoIndex]) return;
+            const lb = document.getElementById('lightbox');
+            document.getElementById('lightbox-img').src = photos[photoIndex];
+            lb.classList.add('active');
+        },
+
+        closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        },
+
+        /* ===== EFFECTS ===== */
+        burstParticles(x, y) {
+            const colors = ['#C9956B', '#D4727A', '#E8C4A0', '#8BAA7A', '#D4A574'];
+            for (let i = 0; i < 10; i++) {
+                const el = document.createElement('div');
+                el.className = 'burst';
+                const angle = (i / 10) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+                const dist = 25 + Math.random() * 25;
+                el.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
+                el.style.setProperty('--ty', `${Math.sin(angle) * dist}px`);
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+                el.style.background = colors[Math.floor(Math.random() * colors.length)];
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 650);
+            }
+        },
+
+        showToast(message, undoCb = null) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            let html = `<span>${this.escHTML(message)}</span>`;
+            if (undoCb) html += `<button class="toast-undo">Batal</button>`;
+            toast.innerHTML = html;
+
+            if (undoCb) {
+                toast.querySelector('.toast-undo').addEventListener('click', () => {
+                    undoCb();
+                    toast.classList.add('exit');
+                    setTimeout(() => toast.remove(), 300);
+                });
+            }
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.classList.add('exit');
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 3500);
+        }
+    };
+
+    /* ===== KEYBOARD ACCESSIBILITY ===== */
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            App.closeAddModal();
+            App.closeLightbox();
+        }
+    });
+
+    /* ===== START ===== */
+    document.addEventListener('DOMContentLoaded', () => App.init());
+    </script>
+</body>
+</html>
